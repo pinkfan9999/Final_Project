@@ -1,0 +1,216 @@
+---
+title: "Write_Up"
+author: "Alexander B. Pastora"
+date: "November 29, 2016"
+output: html_document
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+# Load necessary packages
+library(tidyverse)
+library(jsonlite)
+library(RCurl)
+library(rvest)
+library(forcats)
+library(stringr)
+```
+
+## Data Unpacking and Clean Up
+
+```{r, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+
+# First, unpack the files contained in the tar file.
+untar("yelp_dataset_challenge_academic_dataset.tar")
+
+yelp_business <- stream_in(file("yelp_academic_dataset_business.json"))
+yelp_business_flat <- flatten(yelp_business)
+yelp_business_flat <- yelp_business_flat %>% mutate(categories = as.character(categories))
+
+yelp_checkin <- stream_in(file("yelp_academic_dataset_checkin.json"))
+yelp_checkin_flat <- flatten(yelp_checkin)
+
+#yelp_review <- stream_in(file("yelp_academic_dataset_review.json"))
+#yelp_review_flat <-flatten(yelp_review)
+  
+yelp_tip <- stream_in(file("yelp_academic_dataset_tip.json"))
+yelp_tip_flat <-flatten(yelp_tip)
+
+#yelp_user <- stream_in(file("yelp_academic_dataset_user.json"))
+#yelp_user_flat <-flatten(yelp_user)
+
+# Get US State Abbreviations
+states <-tbl_df(state.abb)
+
+# Only Use US Data
+yelp_business_US <- semi_join(yelp_business_flat, states, by=c("state"= "value"))  
+
+# Fix a few of the entries
+yelp_business_US <- yelp_business_US %>% mutate(state=fct_recode(state, "AZ" = "AK"))
+
+# Lattitude and Longitude to FIPS
+
+latlong2fips <- function(latitude, longitude) {
+  url <- (paste0("http://data.fcc.gov/api/block/find?format=json&latitude=",as.character(latitude),"&longitude=",as.character(longitude),"&showall=false"))
+        data <- fromJSON(RCurl::getURL(url))
+        as.character(data$Block[1])}
+
+```
+
+## Get FIPS Codes
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+
+yelp_US_restaurants <- yelp_business_US %>% filter(str_detect(categories,c("Food","Restaurants")))
+
+yelp_US_restaurants <- yelp_US_restaurants %>% rowwise() %>%  mutate(FIPS = latlong2fips(latitude, longitude))
+
+# Break Up the chunks, so that I can get FIPS Codes faster
+yelp_AZ_restaurants <- yelp_US_restaurants %>% filter(state =="AZ")
+yelp_AZ_restaurants1 <- yelp_AZ_restaurants %>% sample_n(1000)
+yelp_AZ_restaurants_ref <- anti_join(yelp_AZ_restaurants,yelp_AZ_restaurants1, by="business_id")
+yelp_AZ_restaurants2 <- yelp_AZ_restaurants_ref %>% sample_n(1000)
+yelp_AZ_restaurants_ref <- anti_join(yelp_AZ_restaurants_ref,yelp_AZ_restaurants2, by="business_id")
+yelp_AZ_restaurants3 <- yelp_AZ_restaurants_ref %>% sample_n(1000)
+yelp_AZ_restaurants_ref <- anti_join(yelp_AZ_restaurants_ref,yelp_AZ_restaurants3, by="business_id")
+yelp_AZ_restaurants4 <- yelp_AZ_restaurants_ref %>% sample_n(1000)
+yelp_AZ_restaurants_ref <- anti_join(yelp_AZ_restaurants_ref,yelp_AZ_restaurants4, by="business_id")
+yelp_AZ_restaurants5 <- yelp_AZ_restaurants_ref %>% sample_n(1000)
+yelp_AZ_restaurants_ref <- anti_join(yelp_AZ_restaurants_ref,yelp_AZ_restaurants5, by="business_id")
+yelp_AZ_restaurants6 <- yelp_AZ_restaurants_ref %>% sample_n(1000)
+yelp_AZ_restaurants_ref <- anti_join(yelp_AZ_restaurants_ref,yelp_AZ_restaurants6, by="business_id")
+yelp_AZ_restaurants7 <- yelp_AZ_restaurants_ref %>% sample_n(1000)
+yelp_AZ_restaurants_ref <- anti_join(yelp_AZ_restaurants_ref,yelp_AZ_restaurants7, by="business_id")
+yelp_AZ_restaurants8 <- yelp_AZ_restaurants_ref
+
+#Get FIPS Codes
+yelp_AZ_restaurants1 <- yelp_AZ_restaurants1 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_AZ_restaurants2 <- yelp_AZ_restaurants2 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_AZ_restaurants3 <- yelp_AZ_restaurants3 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_AZ_restaurants4 <- yelp_AZ_restaurants4 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_AZ_restaurants5 <- yelp_AZ_restaurants5 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_AZ_restaurants6 <- yelp_AZ_restaurants6 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_AZ_restaurants7 <- yelp_AZ_restaurants7 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_AZ_restaurants8 <- yelp_AZ_restaurants8 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+
+# Recombine
+yelp_AZ_restaurants_ref <- bind_rows(yelp_AZ_restaurants1,yelp_AZ_restaurants2)
+yelp_AZ_restaurants_ref <- bind_rows(yelp_AZ_restaurants_ref, yelp_AZ_restaurants3)
+yelp_AZ_restaurants_ref <- bind_rows(yelp_AZ_restaurants_ref, yelp_AZ_restaurants4)
+yelp_AZ_restaurants_ref <- bind_rows(yelp_AZ_restaurants_ref, yelp_AZ_restaurants5)
+yelp_AZ_restaurants_ref <- bind_rows(yelp_AZ_restaurants_ref, yelp_AZ_restaurants6)
+yelp_AZ_restaurants_ref <- bind_rows(yelp_AZ_restaurants_ref, yelp_AZ_restaurants7)
+yelp_AZ_restaurants_ref <- bind_rows(yelp_AZ_restaurants_ref, yelp_AZ_restaurants8)
+yelp_AZ_restaurants <- yelp_AZ_restaurants_ref
+
+# Done
+yelp_IL_restaurants <- yelp_US_restaurants %>% filter(state =="IL")
+yelp_IL_restaurants <- yelp_IL_restaurants %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+
+# Break Dataset into piece, so that FCC API doesn't have to work as hard, and the response time is faster.
+# Done
+yelp_NC_restaurants <- yelp_US_restaurants %>% filter(state =="NC")
+yelp_NC_restaurants1 <- yelp_NC_restaurants %>% sample_n(1000)
+yelp_NC_restaurants2 <- anti_join(yelp_NC_restaurants,yelp_NC_restaurants1, by="business_id")
+yelp_NC_restaurants1 <- yelp_NC_restaurants1 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_NC_restaurants2 <- yelp_NC_restaurants2 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_NC_restaurants <- bind_rows(yelp_NC_restaurants1,yelp_NC_restaurants2)
+
+
+# Split the data
+yelp_NV_restaurants <- yelp_US_restaurants %>% filter(state =="NV")
+yelp_NV_restaurants1 <- yelp_NV_restaurants %>% sample_n(1000)
+yelp_NV_restaurants_ref <- anti_join(yelp_NV_restaurants,yelp_NV_restaurants1, by="business_id")
+yelp_NV_restaurants2 <- yelp_NV_restaurants_ref %>% sample_n(1000)
+yelp_NV_restaurants_ref <- anti_join(yelp_NV_restaurants_ref,yelp_NV_restaurants2, by="business_id")
+yelp_NV_restaurants3 <- yelp_NV_restaurants_ref %>% sample_n(1000)
+yelp_NV_restaurants_ref <- anti_join(yelp_NV_restaurants_ref,yelp_NV_restaurants3, by="business_id")
+yelp_NV_restaurants4 <- yelp_NV_restaurants_ref %>% sample_n(1000)
+yelp_NV_restaurants_ref <- anti_join(yelp_NV_restaurants_ref,yelp_NV_restaurants4, by="business_id")
+yelp_NV_restaurants5 <- yelp_NV_restaurants_ref
+
+#Get FIPS Codes
+yelp_NV_restaurants1 <- yelp_NV_restaurants1 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_NV_restaurants2 <- yelp_NV_restaurants2 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_NV_restaurants3 <- yelp_NV_restaurants3 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_NV_restaurants4 <- yelp_NV_restaurants4 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+yelp_NV_restaurants5 <- yelp_NV_restaurants5 %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude, longitude))
+# Recombine
+yelp_NV_restaurants_ref <- bind_rows(yelp_NV_restaurants1,yelp_NV_restaurants2)
+yelp_NV_restaurants_ref <- bind_rows(yelp_NV_restaurants_ref, yelp_NV_restaurants3)
+yelp_NV_restaurants_ref <- bind_rows(yelp_NV_restaurants_ref,yelp_NV_restaurants4)
+yelp_NV_restaurants_ref <- bind_rows(yelp_NV_restaurants_ref, yelp_NV_restaurants5)
+yelp_NV_restaurants <- yelp_NV_restaurants_ref
+
+# Done
+yelp_PA_restaurants <- yelp_US_restaurants %>% filter(state=="PA")
+yelp_PA_restaurants <- yelp_PA_restaurants %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude,longitude))
+
+# Done
+yelp_WI_restaurants <- yelp_US_restaurants %>% filter(state=="WI")
+yelp_WI_restaurants <- yelp_WI_restaurants %>% rowwise() %>% mutate(FIPS = latlong2fips(latitude,longitude))
+
+# Recombine Everything
+yelp_US_restaurants_ref <- bind_rows(yelp_AZ_restaurants,yelp_IL_restaurants)
+yelp_US_restaurants_ref <- bind_rows(yelp_US_restaurants_ref, yelp_NC_restaurants)
+yelp_US_restaurants_ref <- bind_rows(yelp_US_restaurants_ref, yelp_NV_restaurants)
+yelp_US_restaurants_ref <- bind_rows(yelp_US_restaurants_ref, yelp_PA_restaurants)
+yelp_US_restaurants_ref <- bind_rows(yelp_US_restaurants_ref, yelp_WI_restaurants)
+yelp_US_restaurants <- yelp_US_restaurants_ref
+
+yelp_US_restaurants <- yelp_US_restaurants %>% mutate(neighborhoods=as.character(neighborhoods))
+write_csv(yelp_US_restaurants,path="yelp_US_restaurants.csv")
+```
+
+## Load the FIPS Data And Combine It
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+# Load US Demographic Data
+Charlotte_Demographic <-read.csv("Charlotte_Demographic.csv")
+Las_Vegas_Demogrpahic <-read.csv("Las_Vegas_Demographic.csv")
+Madison_Demographic <-read.csv("Madison_Demographic.csv")
+Phoenix_Demographic <-read.csv("Phoenix_Demographic.csv")
+Pittsburgh_Demographic <-read.csv("Pittsburgh_Demographic.csv")
+Urbana_Champaign_Demographic <-read.csv("Urbana_Champaign_Demographic.csv")
+
+```
+
+## Exploratory Data Analysis
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+# Don't forget to take care of the NA case in all of these variables
+
+# Distribution of Star Reviews
+ggplot(data=yelp_US_restaurants, aes(x=stars)) + geom_bar()
+yelp_US_restaurants %>% select(stars) %>% summary()
+
+# Stars vs. Price Range
+ggplot(data=yelp_US_restaurants, aes(x=yelp_US_restaurants$'attributes.Price Range', y=stars, group=yelp_US_restaurants$'attributes.Price Range')) +geom_boxplot()
+
+# Stars vs. Attire
+ggplot(data=yelp_US_restaurants, aes(x=yelp_US_restaurants$'attributes.Attire', y=stars, group=yelp_US_restaurants$'attributes.Attire')) +geom_boxplot()
+
+# Stars vs. Take-Out
+ggplot(data=yelp_US_restaurants, aes(x=yelp_US_restaurants$'attributes.Take-out', y=stars, group=yelp_US_restaurants$'attributes.Take-out')) +geom_boxplot()
+
+# Stars vs. Noise Level
+ggplot(data=yelp_US_restaurants, aes(x=yelp_US_restaurants$'attributes.Noise Level', y=stars, group=yelp_US_restaurants$'attributes.Noise Level')) +geom_boxplot()
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
