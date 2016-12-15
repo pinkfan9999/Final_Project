@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
-Codebook for Social Explorer report ID: R11298572
+Codebook for Social Explorer report ID: R11304201
 --------------------------------------------------------------------------------
 
 Contents
@@ -202,17 +202,14 @@ Data Dictionary
 Variables 
       NAME:           Area Name-Legal/Statistical Area Description
       QName:          Qualifying Name
-      AREALAND:       Area (Land)
-      AREAWATR:       Area (Water)
+      FIPS:           FIPS
       SUMLEV:         Summary Level
       GEOCOMP:        Geographic Component
-      REGION:         Region
-      DIVISION:       Division
-      FIPS:           FIPS
       STATE:          State (FIPS)
       COUNTY:         County
+      COUNTYSC:       County Size Code
+      COUSUB:         County Subdivision (FIPS)
       TRACT:          Census Tract
-      BLKGRP:         Block Group
       T001_001:       Total Population
       T002_001:       Total Population
       T002_002:       Population Density (per sq. mile)
@@ -322,6 +319,6 @@ accompanying data, subject to the following conditions:
 
 * Citations should also include the URL for this report:
 
-    http://www.socialexplorer.com/pub/reportdata/HtmlResults.aspx?reportid=R11298572
+    http://www.socialexplorer.com/pub/reportdata/HtmlResults.aspx?reportid=R11304201
 
 If you have any questions contact info@socialexplorer.com

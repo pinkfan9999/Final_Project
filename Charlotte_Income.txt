@@ -1,0 +1,503 @@
+--------------------------------------------------------------------------------
+Codebook for Social Explorer report ID: R11306332
+--------------------------------------------------------------------------------
+
+Contents
+    - Table Summary
+    - Data Dictionary
+    - Citation and Use
+
+
+--------------------------------------------------------------------------------
+Table Summary
+--------------------------------------------------------------------------------
+ 
+Survey:           ACS 2010 (5-Year Estimates)
+Dataset:          Social Explorer Tables:  ACS 2010 (5-Year Estimates)
+Tables:
+
+      1. Total Population
+         Universe:  Total Population
+         Name:      T1
+         Variables:
+            T001_001:   Total Population
+
+
+      2. Population Density (per sq. mile)
+         Universe:  Total Population
+         Name:      T2
+         Variables:
+            T002_001:   Total Population
+            T002_002:   Population Density (per sq. mile)
+            T002_003:   Area (Land)
+
+
+      3. Household Income (In <DollarYear> Inflation Adjusted Dollars)
+         Universe:  Households
+         Name:      T56
+         Variables:
+            T056_001:   Households:
+            T056_002:      Less than $10,000
+            T056_003:      $10,000 to $14,999
+            T056_004:      $15,000 to $19,999
+            T056_005:      $20,000 to $24,999
+            T056_006:      $25,000 to $29,999
+            T056_007:      $30,000 to $34,999
+            T056_008:      $35,000 to $39,999
+            T056_009:      $40,000 to $44,999
+            T056_010:      $45,000 to $49,999
+            T056_011:      $50,000 to $59,999
+            T056_012:      $60,000 to $74,999
+            T056_013:      $75,000 to $99,999
+            T056_014:      $100,000 to $124,999
+            T056_015:      $125,000 to $149,999
+            T056_016:      $150,000 to $199,999
+            T056_017:      $200,000 or More
+
+
+      4. Median Household Income (In <DollarYear> Inflation Adjusted Dollars)
+         Universe:  Households
+         Name:      T57
+         Variables:
+            T057_001:   Median household income (In 2010 Inflation Adjusted Dollars)
+
+
+      5. Median Household Income By Race (In <DollarYear> Inflation Adjusted Dollars)
+         Universe:  Households
+         Name:      T58
+         Variables:
+            T058_001:   Median household income (In 2010 Inflation Adjusted Dollars):
+            T058_002:      White Alone Householder
+            T058_003:      Black or African American Alone Householder
+            T058_004:      American Indian and Alaska Native Alone  Householder
+            T058_005:      Asian Alone
+            T058_006:      Native Hawaiian and Other Pacific Islander Alone  Householder
+            T058_007:      Some Other Race Alone Householder
+            T058_008:      Two or More Races Householder
+            T058_009:      Hispanic or Latino Householder
+            T058_010:      White Alone Householder, not Hispanic or Latino
+
+
+      6. Average Household Income (In <DollarYear> Inflation Adjusted Dollars)
+         Universe:  Households
+         Name:      T59
+         Variables:
+            T059_001:   Average household income (In 2010 Inflation Adjusted Dollars)
+
+
+      7. Median Family Income (In <DollarYear> Inflation Adjusted Dollars)
+         Universe:  Families
+         Name:      T61
+         Variables:
+            T061_001:   Median Family Income (In 2010 Inflation adjusted dollars)
+
+
+      8. Average Family Income (In <DollarYear> Inflation Adjusted Dollars)
+         Universe:  Families
+         Name:      T62
+         Variables:
+            T062_001:   Average Family Income (In 2010 Inflation adjusted dollars)
+
+
+      9. Median Nonfamily Household Income (In <DollarYear> Inflation Adjusted Dollars)
+         Universe:  Nonfamily Households
+         Name:      T63
+         Variables:
+            T063_001:   Median Nonfamily Household Income (In 2010 Inflation Adjusted Dollars)
+
+
+      10. Average NonFamily Income (In <DollarYear> Inflation Adjusted Dollars)
+          Universe:  Nonfamily Households
+          Name:      T64
+          Variables:
+             T064_001:   Average Nonfamily Income (In 2010 Inflation Adjusted Dollars)
+
+
+      11. Median Income By Sex By Work Experience (In <DollarYear> Inflation Adjusted Dollars) (For Population Age 15+)
+          Universe:  Population 15 years and Over with income in the past 12 months
+          Name:      T65
+          Variables:
+             T065_001:   Median Income For Population 15 years and Over:
+             T065_002:      Male:
+             T065_003:         Worked full-time, year-round in the past 12 months
+             T065_004:         Other
+             T065_005:      Female:
+             T065_006:         Worked full-time, year-round in the past 12 months
+             T065_007:         Other
+
+
+      12. Median Earnings By Sex By Educational Attainment (In <DollarYear> Inflation Adjusted Dollars) (For Population Age 25+)
+          Universe:  Population 25 years and Over with earnings
+          Name:      T66
+          Variables:
+             T066_001:   Median Earnings:
+             T066_002:      Less than High School Graduate
+             T066_003:      High School Graduate (includes equivalency)
+             T066_004:      Some college or associate's degree
+             T066_005:      Bachelor's degree
+             T066_006:      Graduate or professional degree
+             T066_007:      Male:
+             T066_008:         Less than High School Graduate
+             T066_009:         High School Graduate (includes equivalency)
+             T066_010:         Some college or associate's degree
+             T066_011:         Bachelor's degree
+             T066_012:         Graduate or professional degree
+             T066_013:      Female:
+             T066_014:         Less than High School Graduate
+             T066_015:         High School Graduate (includes equivalency)
+             T066_016:         Some college or associate's degree
+             T066_017:         Bachelor's degree
+             T066_018:         Graduate or professional degree
+
+
+      13. Median Household Income By Tenure (In <DollarYear> Inflation Adjusted Dollars)
+          Universe:  Occupied housing units
+          Name:      T67
+          Variables:
+             T067_001:   Median Household Income Occupied housing units:
+             T067_002:      Owner occupied
+             T067_003:      Renter occupied
+
+
+      14. Households with Earnings
+          Universe:  Households
+          Name:      T74
+          Variables:
+             T074_001:   Households:
+             T074_002:      With earnings
+             T074_003:      No earnings
+
+
+      15. Households with Wage or Salary Income
+          Universe:  Households
+          Name:      T75
+          Variables:
+             T075_001:   Households:
+             T075_002:      With wage or salary income
+             T075_003:      No wage or salary income
+
+
+      16. Households with Self-Employment Income
+          Universe:  Households
+          Name:      T76
+          Variables:
+             T076_001:   Households:
+             T076_002:      With self-employment income
+             T076_003:      No self-employment income
+
+
+      17. Households with Interest, Dividends, or Net Rental Income
+          Universe:  Households
+          Name:      T77
+          Variables:
+             T077_001:   Households:
+             T077_002:      With interest, dividends, or net rental income
+             T077_003:      No interest, dividends, or net rental income
+
+
+      18. Households with Social Security Income
+          Universe:  Households
+          Name:      T78
+          Variables:
+             T078_001:   Households:
+             T078_002:      With Social Security income
+             T078_003:      No Social Security income
+
+
+      19. Households with Supplemental Security Income (SSI)
+          Universe:  Households
+          Name:      T79
+          Variables:
+             T079_001:   Households:
+             T079_002:      With Supplemental Security Income (SSI)
+             T079_003:      No Supplemental Security Income (SSI)
+
+
+      20. Households with Public Assistance Income
+          Universe:  Households
+          Name:      T80
+          Variables:
+             T080_001:   Households:
+             T080_002:      With public assistance income
+             T080_003:      No public assistance income
+
+
+      21. Households with Retirement Income
+          Universe:  Households
+          Name:      T81
+          Variables:
+             T081_001:   Households:
+             T081_002:      With retirement income
+             T081_003:      No retirement income
+
+
+      22. Households with Other Types of Income
+          Universe:  Households
+          Name:      T82
+          Variables:
+             T082_001:   Households:
+             T082_002:      With Other types of income
+             T082_003:      No Other types of income
+
+
+      23. Per Capita Income (In <DollarYear> Inflation Adjusted Dollars)
+          Universe:  Total Population
+          Name:      T83
+          Variables:
+             T083_001:   Per capita income (In 2010 Inflation adjusted dollars)
+
+
+      24. Per Capita Income (In <DollarYear> Inflation Adjusted Dollars) (White Alone)
+          Universe:  White Alone Population
+          Name:      T84
+          Variables:
+             T084_001:   Per capita income (In 2010 Inflation adjusted dollars)
+
+
+      25. Per Capita Income (In <DollarYear> Inflation Adjusted Dollars) (Black or African American Alone)
+          Universe:  Black or African American Alone Population
+          Name:      T85
+          Variables:
+             T085_001:   Per capita income (In 2010 Inflation adjusted dollars)
+
+
+      26. Per Capita Income (In <DollarYear> Inflation Adjusted Dollars) (American Indian and Alaska Native Alone)
+          Universe:  American Indian and Alaska Native Alone Population
+          Name:      T86
+          Variables:
+             T086_001:   Per capita income (In 2010 Inflation adjusted dollars)
+
+
+      27. Per Capita Income (In <DollarYear> Inflation Adjusted Dollars) (Asian Alone)
+          Universe:  Asian Alone Population
+          Name:      T87
+          Variables:
+             T087_001:   Per capita income (In 2010 Inflation adjusted dollars)
+
+
+      28. Per Capita Income (In <DollarYear> Inflation Adjusted Dollars) (Native Hawaiian and Other Pacific Islander Alone)
+          Universe:  Native Hawaiian and Other Pacific Islander Alone Population
+          Name:      T88
+          Variables:
+             T088_001:   Per capita income (In 2010 Inflation adjusted dollars)
+
+
+      29. Per Capita Income (In <DollarYear> Inflation Adjusted Dollars) (Some Other Race Alone)
+          Universe:  Some Other Race Alone Population
+          Name:      T89
+          Variables:
+             T089_001:   Per capita income (In 2010 Inflation adjusted dollars)
+
+
+      30. Per Capita Income (In <DollarYear> Inflation Adjusted Dollars) (Two or More Races)
+          Universe:  Two or More Races Population
+          Name:      T90
+          Variables:
+             T090_001:   Per capita income (In 2010 Inflation adjusted dollars)
+
+
+      31. Per Capita Income (In <DollarYear> Inflation Adjusted Dollars) (Hispanic or Latino)
+          Universe:  Hispanic or Latino Population
+          Name:      T91
+          Variables:
+             T091_001:   Per capita income (In 2010 Inflation adjusted dollars)
+
+
+      32. Per Capita Income (In <DollarYear> Inflation Adjusted Dollars) (White Alone, Not Hispanic or Latino)
+          Universe:  White Alone, not Hispanic or Latino Population
+          Name:      T92
+          Variables:
+             T092_001:   Per capita income (In 2010 Inflation adjusted dollars)
+
+
+
+
+
+ 
+ 
+ 
+--------------------------------------------------------------------------------
+Data Dictionary
+--------------------------------------------------------------------------------
+ 
+Variables 
+      FIPS:           FIPS
+      GEOID:          Geographic Identifier
+      NAME:           Name of Area
+      QName:          Qualifying Name
+      STUSAB:         State/U.S.-Abbreviation (USPS)
+      SUMLEV:         Summary Level
+      GEOCOMP:        Geographic Component
+      FILEID:         File Identification
+      LOGRECNO:       Logical Record Number
+      US:             US
+      REGION:         Region
+      DIVISION:       Division
+      STATECE:        State (Census Code)
+      STATE:          State (FIPS)
+      COUNTY:         County
+      COUSUB:         County Subdivision (FIPS)
+      PLACE:          Place (FIPS Code)
+      PLACESE:        Place (State FIPS + Place FIPS)
+      TRACT:          Census Tract
+      BLKGRP:         Block Group
+      CONCIT:         Consolidated City
+      AIANHH:         American Indian Area/Alaska Native Area/Hawaiian Home Land (Census)
+      AIANHHFP:       American Indian Area/Alaska Native Area/Hawaiian Home Land (FIPS)
+      AIHHTLI:        American Indian Trust Land/Hawaiian Home Land Indicator
+      AITSCE:         American Indian Tribal Subdivision (Census)
+      AITS:           American Indian Tribal Subdivision (FIPS)
+      ANRC:           Alaska Native Regional Corporation (FIPS)
+      CBSA:           Metropolitan and Micropolitan Statistical Area
+      CSA:            Combined Statistical Area
+      METDIV:         Metropolitan Division
+      MACC:           Metropolitan Area Central City
+      MEMI:           Metropolitan/Micropolitan Indicator Flag
+      NECTA:          New England City and Town Combined Statistical Area
+      CNECTA:         New England City and Town Area
+      NECTADIV:       New England City and Town Area Division
+      UA:             Urban Area
+      UACP:           Urban Area Central Place
+      CDCURR:         Current Congressional District ***
+      SLDU:           State Legislative District Upper
+      SLDL:           State Legislative District Lower
+      VTD:            Voting District
+      ZCTA3:          ZIP Code Tabulation Area (3-digit)
+      ZCTA5:          ZIP Code Tabulation Area (5-digit)
+      SUBMCD:         Subbarrio (FIPS)
+      SDELM:          School District (Elementary)
+      SDSEC:          School District (Secondary)
+      SDUNI:          School District (Unified)
+      UR:             Urban/Rural
+      PCI:            Principal City Indicator
+      TAZ:            Traffic Analysis Zone
+      UGA:            Urban Growth Area
+      BTTR:           Tribal Tract
+      BTBG:           Tribal Block Group
+      PUMA5:          Public Use Microdata Area - 5% File
+      PUMA1:          Public Use Microdata Area - 1% File
+      T001_001:       Total Population
+      T002_001:       Total Population
+      T002_002:       Population Density (per sq. mile)
+      T002_003:       Area (Land)
+      T056_001:       Households:
+      T056_002:       Households: Less than $10,000
+      T056_003:       Households: $10,000 to $14,999
+      T056_004:       Households: $15,000 to $19,999
+      T056_005:       Households: $20,000 to $24,999
+      T056_006:       Households: $25,000 to $29,999
+      T056_007:       Households: $30,000 to $34,999
+      T056_008:       Households: $35,000 to $39,999
+      T056_009:       Households: $40,000 to $44,999
+      T056_010:       Households: $45,000 to $49,999
+      T056_011:       Households: $50,000 to $59,999
+      T056_012:       Households: $60,000 to $74,999
+      T056_013:       Households: $75,000 to $99,999
+      T056_014:       Households: $100,000 to $124,999
+      T056_015:       Households: $125,000 to $149,999
+      T056_016:       Households: $150,000 to $199,999
+      T056_017:       Households: $200,000 or More
+      T057_001:       Median household income (In 2010 Inflation Adjusted Dollars)
+      T058_001:       Median household income (In 2010 Inflation Adjusted Dollars):
+      T058_002:       Median household income (In 2010 Inflation Adjusted Dollars): White Alone Householder
+      T058_003:       Median household income (In 2010 Inflation Adjusted Dollars): Black or African American Alone Householder
+      T058_004:       Median household income (In 2010 Inflation Adjusted Dollars): American Indian and Alaska Native Alone  Householder
+      T058_005:       Median household income (In 2010 Inflation Adjusted Dollars): Asian Alone
+      T058_006:       Median household income (In 2010 Inflation Adjusted Dollars): Native Hawaiian and Other Pacific Islander Alone  Householder
+      T058_007:       Median household income (In 2010 Inflation Adjusted Dollars): Some Other Race Alone Householder
+      T058_008:       Median household income (In 2010 Inflation Adjusted Dollars): Two or More Races Householder
+      T058_009:       Median household income (In 2010 Inflation Adjusted Dollars): Hispanic or Latino Householder
+      T058_010:       Median household income (In 2010 Inflation Adjusted Dollars): White Alone Householder, not Hispanic or Latino
+      T059_001:       Average household income (In 2010&nbsp; Inflation&nbsp;&nbsp;&nbsp;&nbsp; Adjusted Dollars)
+      T061_001:       Median Family Income (In 2010 Inflation adjusted dollars)
+      T062_001:       Average Family Income (In 2010 Inflation adjusted dollars)
+      T063_001:       Median Nonfamily Household Income (In&nbsp; 2010&nbsp;&nbsp;&nbsp;&nbsp; Inflation Adjusted Dollars)
+      T064_001:       Average Nonfamily Income (In 2010&nbsp; Inflation&nbsp;&nbsp;&nbsp;&nbsp; Adjusted Dollars)
+      T065_001:       Median Income For Population 15 years and Over:
+      T065_002:       Median Income For Population 15 years and Over: Male
+      T065_003:       Median Income For Population 15 years and Over: Male: Worked full-time, year-round in the past 12 months
+      T065_004:       Median Income For Population 15 years and Over: Male: Other
+      T065_005:       Median Income For Population 15 years and Over: Female
+      T065_006:       Median Income For Population 15 years and Over: Female: Worked full-time, year-round in the past 12 months
+      T065_007:       Median Income For Population 15 years and Over: Female: Other
+      T066_001:       Median Earnings:
+      T066_002:       Median Earnings: Less than High School Graduate
+      T066_003:       Median Earnings: High School Graduate (includes equivalency)
+      T066_004:       Median Earnings: Some college or associate's degree
+      T066_005:       Median Earnings: Bachelor's degree
+      T066_006:       Median Earnings: Graduate or professional degree
+      T066_007:       Median Earnings: Male
+      T066_008:       Median Earnings: Male: Less than High School Graduate
+      T066_009:       Median Earnings: Male: High School Graduate (includes equivalency)
+      T066_010:       Median Earnings: Male: Some college or associate's degree
+      T066_011:       Median Earnings: Male: Bachelor's degree
+      T066_012:       Median Earnings: Male: Graduate or professional degree
+      T066_013:       Median Earnings: Female
+      T066_014:       Median Earnings: Female: Less than High School Graduate
+      T066_015:       Median Earnings: Female: High School Graduate (includes equivalency)
+      T066_016:       Median Earnings: Female: Some college or associate's degree
+      T066_017:       Median Earnings: Female: Bachelor's degree
+      T066_018:       Median Earnings: Female: Graduate or professional degree
+      T067_001:       Median Household Income Occupied housing units:
+      T067_002:       Median Household Income Occupied housing units: Owner occupied
+      T067_003:       Median Household Income Occupied housing units: Renter occupied
+      T074_001:       Households:
+      T074_002:       Households: with earnings
+      T074_003:       Households: No earnings
+      T075_001:       Households:
+      T075_002:       Households: with wage or salary income
+      T075_003:       Households: No wage or salary income
+      T076_001:       Households:
+      T076_002:       Households: with self-employment income
+      T076_003:       Households: No self-employment income
+      T077_001:       Households:
+      T077_002:       Households: with interest, dividends, or net rental income
+      T077_003:       Households: No interest, dividends, or net rental income
+      T078_001:       Households:
+      T078_002:       Households: with Social Security income
+      T078_003:       Households: No Social Security income
+      T079_001:       Households:
+      T079_002:       Households: with Supplemental Security Income (SSI)
+      T079_003:       Households: No Supplemental Security Income (SSI)
+      T080_001:       Households:
+      T080_002:       Households: with public assistance income
+      T080_003:       Households: No public assistance income
+      T081_001:       Households:
+      T081_002:       Households: with retirement income
+      T081_003:       Households: No retirement income
+      T082_001:       Households:
+      T082_002:       Households: with Other types of income
+      T082_003:       Households: No Other types of income
+      T083_001:       Per capita income (In 2010 Inflation adjusted dollars)
+      T084_001:       Per capita income (In 2010 Inflation adjusted dollars)
+      T085_001:       Per capita income (In 2010 Inflation adjusted dollars)
+      T086_001:       Per capita income (In 2010 Inflation adjusted dollars)
+      T087_001:       Per capita income (In 2010 Inflation adjusted dollars)
+      T088_001:       Per capita income (In 2010 Inflation adjusted dollars)
+      T089_001:       Per capita income (In 2010 Inflation adjusted dollars)
+      T090_001:       Per capita income (In 2010 Inflation adjusted dollars)
+      T091_001:       Per capita income (In 2010 Inflation adjusted dollars)
+      T092_001:       Per capita income (In 2010 Inflation adjusted dollars)
+
+
+
+
+--------------------------------------------------------------------------------
+Citation and Use of Data
+--------------------------------------------------------------------------------
+ 
+All persons are granted a limited license to use this documentation and the
+accompanying data, subject to the following conditions:
+
+* Publications and research reports employing the data
+  must cite it appropriately. The citation should include the following:
+
+	  www.socialexplorer.com
+	  New York City, NY: Social Explorer 2016
+
+
+* Citations should also include the URL for this report:
+
+    http://www.socialexplorer.com/pub/reportdata/HtmlResults.aspx?reportid=R11306332
+
+If you have any questions contact info@socialexplorer.com
