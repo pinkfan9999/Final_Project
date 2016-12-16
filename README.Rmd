@@ -26,8 +26,10 @@ output:
 #
 library(ggplot2)
 library(dplyr)
+library(tidyverse)
 yelp_US_restaurants <- read_csv("yelp_US_restaurants.csv")
 # Stars vs. Price Range 
 ggplot(data=yelp_US_restaurants, aes(x=yelp_US_restaurants$'attributes.Price Range', y=stars, group=yelp_US_restaurants$'attributes.Price Range')) +geom_boxplot()
 ```
+
 This graph is example of some of the Exploratory Analysis done in this paper. It is specifically looking at how the distribution of star ratings changes with price range (out of 4).
