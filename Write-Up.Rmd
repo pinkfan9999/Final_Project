@@ -2,11 +2,13 @@
 title: "Write_Up"
 author: "Alexander B. Pastora"
 date: "November 29, 2016"
-output: html_document
+output:
+  html_document: default
 ---
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
 # Load necessary packages
+set.seed(76)
 library(tidyverse)
 library(jsonlite)
 library(RCurl)
@@ -15,9 +17,22 @@ library(forcats)
 library(stringr)
 ```
 
+## Abstract
+
+This study looked at star ratings of restaurants in Charlotte, Las Vegas, Madison, Phoenix, Pittsburgh and Urbana_Champaing. Specifically, this data was used to create a model that attempts determine if a Good Star Rating (greater than 3 out of 5) could be determined from certain attributes of a restaurant. In addition to these attributes, demographic and income data were incorporated into the model. Although a model was created for the restaurant data, the model was only accurate about 63% of the time. This suggests that predicting a restaurant's rating by attributes and location is not an accurate method. This may suggest that, for the restaurant data, other factors such as the quality and taste of the food may be more important.
+
+## Introduction
+
+Yelp is a website where people can look up businesses, view information and certain attributes associated with these businesses, and review the businesses. One specific aspect of Yelp is that it assigns each of these businesses a star rating out of 5 based on all of the reviews that have been created about the business. The main goal of this project is to determine if these star ratings are "genuine" or if they can be predicted by certain attributes associated with the business, as well as demographic and income information based on the location of the business. Specifically, this project will focus on predicting a star rating for restaurants, since one would expect that a restaurant's star rating would depend almost exculsively on food taste and quality.
+
 ## Data Unpacking and Clean Up
 
-```{r, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+The data about the Restaurants on Yelp was taken from the Yelp Dataset Challenge. Since these data were prepared specifically by Yelp, the dataset only includes business in Edinburgh(Scotland), Karlsruhe(Germany), Montreal(Canada), Waterloo (Canada), Charlotte, Las Vegas, Phoenix, Pittsburg, Madison, and Urbana-Champaign. Since the dataset was specifically prepared for a Challege, it does not necessary encompass all of the businesses/restaurants in these areas.
+
+This dataset came in the form of a TAR File, which is very similar to a ZIP File, meaning that the TAR File actually contains multiple files within it. Once unpacked, the dataset was presented in the form of 5 JSON files. I then converted these JSON files into data tables that could be used in RStudio. The specfic method that I used was developed by Kan Nishida.
+
+Since demographic and income data will be incorporated into the model, this particular project only focused on restaurants in the United States. In order to get demographic and income data about each of the restaurants, it was necessary to first get the FIPS codes for all of the restaurants. This was done through utilization of the FCC's Census Block Conversion API, which takes a Longitude and Latitude, and returns the associated FIPS Code. In order to do this, a function had to be created that grabbed the lattitude and longitude of each restaurant, combined it into a generalized URL format, pulled the data from this specific Url associated with the restaurants location, and extracted the FIPS Code associated with the restaurant. My specific function was modified from a function by John Ramey. 
+```{r, eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
 
 # First, unpack the files contained in the tar file.
 untar("yelp_dataset_challenge_academic_dataset.tar")
@@ -29,24 +44,23 @@ yelp_business_flat <- yelp_business_flat %>% mutate(categories = as.character(ca
 yelp_checkin <- stream_in(file("yelp_academic_dataset_checkin.json"))
 yelp_checkin_flat <- flatten(yelp_checkin)
 
-#yelp_review <- stream_in(file("yelp_academic_dataset_review.json"))
-#yelp_review_flat <-flatten(yelp_review)
+yelp_review <- stream_in(file("yelp_academic_dataset_review.json"))
+yelp_review_flat <-flatten(yelp_review)
   
 yelp_tip <- stream_in(file("yelp_academic_dataset_tip.json"))
 yelp_tip_flat <-flatten(yelp_tip)
 
-#yelp_user <- stream_in(file("yelp_academic_dataset_user.json"))
-#yelp_user_flat <-flatten(yelp_user)
+yelp_user <- stream_in(file("yelp_academic_dataset_user.json"))
+yelp_user_flat <-flatten(yelp_user)
 
 # Get US State Abbreviations
 states <-tbl_df(state.abb)
 
 # Only Use US Data
-yelp_business_US <- semi_join(yelp_business_flat, states, by=c("state"= "value"))  
+yelp_business_US <- semi_join(yelp_business_flat, states, by=c("state"= "value"))
 
-# Fix a few of the entries
-yelp_business_US <- yelp_business_US %>% mutate(state=fct_recode(state, "AZ" = "AK"))
-
+# Only Use Restaurants
+yelp_US_restaurants <- yelp_business_US %>% filter(str_detect(categories,c("Food","Restaurants")))
 # Lattitude and Longitude to FIPS
 
 latlong2fips <- function(latitude, longitude) {
@@ -56,13 +70,16 @@ latlong2fips <- function(latitude, longitude) {
 
 ```
 
+
 ## Get FIPS Codes
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+In order to get the FIPS Codes from the API, I first chopped up the dataset by states, and then further chopped up the states so that each piece had about 1000. The purpose of choppin up the dataset is to improve the response time from the API. By chopping up the data into pieces, the response time was about 10 minutes per piece. After all of the FIPS codes were obtained and added to the restaurants, all of the pieces were recombined to reform the original dataset.
+
+Since the whole process of getting the FIPS codes took so much time, I exported the dataset into a csv file so that the FIPS codes do not have to be taken from the API again, and to shorten the runtime of this Markdown File. This specific csv file, however, only included the columns of the dataset that were relevant to the Exploratory Data Analysis Performed later in this write-up.
+
+```{r, eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
 
 yelp_US_restaurants <- yelp_business_US %>% filter(str_detect(categories,c("Food","Restaurants")))
-
-yelp_US_restaurants <- yelp_US_restaurants %>% rowwise() %>%  mutate(FIPS = latlong2fips(latitude, longitude))
 
 # Break Up the chunks, so that I can get FIPS Codes faster
 yelp_AZ_restaurants <- yelp_US_restaurants %>% filter(state =="AZ")
@@ -157,60 +174,262 @@ yelp_US_restaurants_ref <- bind_rows(yelp_US_restaurants_ref, yelp_PA_restaurant
 yelp_US_restaurants_ref <- bind_rows(yelp_US_restaurants_ref, yelp_WI_restaurants)
 yelp_US_restaurants <- yelp_US_restaurants_ref
 
-yelp_US_restaurants <- yelp_US_restaurants %>% mutate(neighborhoods=as.character(neighborhoods))
-write_csv(yelp_US_restaurants,path="yelp_US_restaurants.csv")
+yelp_US_restaurants_csv<- yelp_US_restaurants %>% 
+  select(FIPS,business_id,full_address,open,categories,city,review_count,name,longitude,state,stars,latitude,type,`attributes.Price Range`,attributes.Attire,`attributes.Take-out`,`attributes.Noise Level`,attributes.Alcohol,`attributes.Accepts Credit Cards`,`attributes.Wi-Fi`,`attributes.Good For.latenight`,attributes.Ambience.romantic,attributes.Ambience.intimate,attributes.Ambience.classy, attributes.Ambience.touristy, attributes.Parking.valet, attributes.Parking.validated, attributes.Parking.street,attributes.Music.background_music, `attributes.Dietary Restrictions.vegetarian`)
+write_csv(yelp_US_restaurants_csv,path="yelp_US_restaurants.csv")
 ```
 
-## Load the FIPS Data And Combine It
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+## Load the Demographic Data, Fix FIPS Codes, And Combine Datasets
+
+The Demographic Data used in this experiment was taken from Social Explorer, and is specifically from the 2010 US Census. In order to speed up the response time of Social Explorer, the Demographic Data was exported as 6 different CSV files, seperated by the 6 different cities in the Yelp Data Set. Since this was the case, the Yelp Dataset was again split into six pieces based on the state. The relevant Demographic Data was appended to each restaurant based on the associated FIPS codes. All of the pieces were then recombined to reform the original dataset.
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+yelp_US_restaurants <- read_csv("yelp_US_restaurants.csv")
+
 # Load US Demographic Data
 Charlotte_Demographic <-read.csv("Charlotte_Demographic.csv")
-Las_Vegas_Demogrpahic <-read.csv("Las_Vegas_Demographic.csv")
+Las_Vegas_Demographic <-read.csv("Las_Vegas_Demographic.csv")
 Madison_Demographic <-read.csv("Madison_Demographic.csv")
 Phoenix_Demographic <-read.csv("Phoenix_Demographic.csv")
 Pittsburgh_Demographic <-read.csv("Pittsburgh_Demographic.csv")
 Urbana_Champaign_Demographic <-read.csv("Urbana_Champaign_Demographic.csv")
 
+#Fix FIPS Codes
+Charlotte_Demographic <- Charlotte_Demographic %>% 
+  mutate(Geo_FIPS= as.character(Geo_FIPS))
+
+Las_Vegas_Demographic <- Las_Vegas_Demographic %>% 
+  mutate(Geo_FIPS= as.character(Geo_FIPS))
+
+Madison_Demographic <- Madison_Demographic %>% 
+  mutate(Geo_FIPS= as.character(Geo_FIPS))
+
+Phoenix_Demographic <- Phoenix_Demographic %>% 
+  mutate(Geo_FIPS= str_pad(as.character(Geo_FIPS),11, pad="0"))
+
+Pittsburgh_Demographic <- Pittsburgh_Demographic %>% 
+  mutate(Geo_FIPS= as.character(Geo_FIPS))
+
+Urbana_Champaign_Demographic <- Urbana_Champaign_Demographic %>% 
+  mutate(Geo_FIPS= as.character(Geo_FIPS))
+
+# Shorten FIPS Codes in Other Set
+yelp_AZ_restaurants_ref <- yelp_US_restaurants %>% 
+  filter(state=="AZ") %>% 
+  mutate(FIPS = str_sub(FIPS, 1,11))
+yelp_IL_restaurants_ref <- yelp_US_restaurants %>% 
+  filter(state=="IL") %>% 
+  mutate(FIPS= str_sub(FIPS, 1, 12))
+yelp_NC_restaurants_ref <- yelp_US_restaurants %>% 
+  filter(state=="NC") %>% 
+  mutate(FIPS= str_sub(FIPS, 1, 11))
+yelp_NV_restaurants_ref <- yelp_US_restaurants %>% 
+  filter(state=="NV") %>% 
+  mutate(FIPS= str_sub(FIPS, 1, 11))
+yelp_PA_restaurants_ref <- yelp_US_restaurants %>% 
+  filter(state=="PA") %>% 
+  mutate(FIPS= str_sub(FIPS, 1, 12))
+yelp_WI_restaurants_ref <- yelp_US_restaurants %>%
+  filter(state=="WI") %>% 
+  mutate(FIPS= str_sub(FIPS, 1, 11))
+
+# Choose certain variables to utilize
+Charlotte_Demographic_copy <- Charlotte_Demographic %>% 
+  select(Geo_FIPS,SE_T008_001,SE_T008_006,SE_T008_007, SE_T044_001, SE_T044_002, SE_T044_003, SE_T054_001, SE_T054_002,SE_T054_003,SE_T054_004,SE_T054_005,SE_T054_006,SE_T054_007,SE_T054_008)
+
+Las_Vegas_Demographic_copy <- Las_Vegas_Demographic %>% 
+  select(Geo_FIPS,SE_T008_001,SE_T008_006,SE_T008_007, SE_T044_001, SE_T044_002, SE_T044_003, SE_T054_001, SE_T054_002,SE_T054_003,SE_T054_004,SE_T054_005,SE_T054_006,SE_T054_007,SE_T054_008)
+
+Madison_Demographic_copy <- Madison_Demographic %>% 
+  select(Geo_FIPS,SE_T008_001,SE_T008_006,SE_T008_007, SE_T044_001, SE_T044_002, SE_T044_003, SE_T054_001, SE_T054_002,SE_T054_003,SE_T054_004,SE_T054_005,SE_T054_006,SE_T054_007,SE_T054_008)
+
+Phoenix_Demographic_copy <- Phoenix_Demographic %>% 
+  select(Geo_FIPS,SE_T008_001,SE_T008_006,SE_T008_007, SE_T044_001, SE_T044_002, SE_T044_003, SE_T054_001, SE_T054_002,SE_T054_003,SE_T054_004,SE_T054_005,SE_T054_006,SE_T054_007,SE_T054_008)
+
+Pittsburgh_Demographic_copy <- Pittsburgh_Demographic %>% 
+  select(Geo_FIPS,SE_T008_001,SE_T008_006,SE_T008_007, SE_T044_001, SE_T044_002, SE_T044_003, SE_T054_001, SE_T054_002,SE_T054_003,SE_T054_004,SE_T054_005,SE_T054_006,SE_T054_007,SE_T054_008)
+
+Urbana_Champaign_Demographic_copy <- Urbana_Champaign_Demographic %>% 
+  select(Geo_FIPS,SE_T008_001,SE_T008_006,SE_T008_007, SE_T044_001, SE_T044_002, SE_T044_003, SE_T054_001, SE_T054_002,SE_T054_003,SE_T054_004,SE_T054_005,SE_T054_006,SE_T054_007,SE_T054_008)
+
+# Rename Variables
+Charlotte_Demographic_copy <- Charlotte_Demographic_copy %>% 
+  mutate(Proportion_18_to_24 = (SE_T008_006/SE_T008_001)) %>% 
+  mutate(Proportion_25_to_34 = (SE_T008_007/SE_T008_001)) %>% 
+  mutate(Average_Age = (SE_T044_001)) %>% 
+  mutate(Proportion_White = (SE_T054_002/SE_T054_001)) %>% 
+  mutate(Proportion_Black = (SE_T054_003/SE_T054_001))
+
+Las_Vegas_Demographic_copy <- Las_Vegas_Demographic_copy %>% 
+  mutate(Proportion_18_to_24 = (SE_T008_006/SE_T008_001)) %>% 
+  mutate(Proportion_25_to_34 = (SE_T008_007/SE_T008_001)) %>% 
+  mutate(Average_Age = (SE_T044_001)) %>% 
+  mutate(Proportion_White = (SE_T054_002/SE_T054_001)) %>% 
+  mutate(Proportion_Black = (SE_T054_003/SE_T054_001))
+
+Madison_Demographic_copy <- Madison_Demographic_copy %>% 
+  mutate(Proportion_18_to_24 = (SE_T008_006/SE_T008_001)) %>% 
+  mutate(Proportion_25_to_34 = (SE_T008_007/SE_T008_001)) %>% 
+  mutate(Average_Age = (SE_T044_001)) %>% 
+  mutate(Proportion_White = (SE_T054_002/SE_T054_001)) %>% 
+  mutate(Proportion_Black = (SE_T054_003/SE_T054_001))
+
+Phoenix_Demographic_copy <- Phoenix_Demographic_copy %>% 
+  mutate(Proportion_18_to_24 = (SE_T008_006/SE_T008_001)) %>% 
+  mutate(Proportion_25_to_34 = (SE_T008_007/SE_T008_001)) %>% 
+  mutate(Average_Age = (SE_T044_001)) %>% 
+  mutate(Proportion_White = (SE_T054_002/SE_T054_001)) %>% 
+  mutate(Proportion_Black = (SE_T054_003/SE_T054_001))
+
+Pittsburgh_Demographic_copy <- Pittsburgh_Demographic_copy %>% 
+  mutate(Proportion_18_to_24 = (SE_T008_006/SE_T008_001)) %>% 
+  mutate(Proportion_25_to_34 = (SE_T008_007/SE_T008_001)) %>% 
+  mutate(Average_Age = (SE_T044_001)) %>% 
+  mutate(Proportion_White = (SE_T054_002/SE_T054_001)) %>% 
+  mutate(Proportion_Black = (SE_T054_003/SE_T054_001))
+
+Urbana_Champaign_Demographic_copy <- Urbana_Champaign_Demographic_copy %>% 
+  mutate(Proportion_18_to_24 = (SE_T008_006/SE_T008_001)) %>% 
+  mutate(Proportion_25_to_34 = (SE_T008_007/SE_T008_001)) %>% 
+  mutate(Average_Age = (SE_T044_001)) %>% 
+  mutate(Proportion_White = (SE_T054_002/SE_T054_001)) %>% 
+  mutate(Proportion_Black = (SE_T054_003/SE_T054_001))
+
+# Combing Demographic Data
+#Done
+yelp_AZ_restaurants_ref2 <- left_join(yelp_AZ_restaurants_ref, Phoenix_Demographic_copy, by=c("FIPS"="Geo_FIPS"))
+
+#Done
+yelp_IL_restaurants_ref <- left_join(yelp_IL_restaurants_ref, Urbana_Champaign_Demographic_copy, by=c("FIPS"="Geo_FIPS"))
+#Done
+yelp_NC_restaurants_ref <- left_join(yelp_NC_restaurants_ref, Charlotte_Demographic_copy, by=c("FIPS"="Geo_FIPS"))
+#Done
+yelp_NV_restaurants_ref <- left_join(yelp_NV_restaurants_ref, Las_Vegas_Demographic_copy, by=c("FIPS"="Geo_FIPS"))
+#Done
+yelp_PA_restaurants_ref <- left_join(yelp_PA_restaurants_ref, Pittsburgh_Demographic_copy, by=c("FIPS"="Geo_FIPS"))
+#Done
+yelp_WI_restaurants_ref <- left_join(yelp_WI_restaurants_ref, Madison_Demographic_copy, by=c("FIPS"="Geo_FIPS"))
+
+
+
+
+
+
 ```
+
+## Load the Income Data, Fix FIPS Codes, And Combine Datasets
+The Income Data used in this experiment was taken from Social Explorer, and is specifically from the 2010 ACS Report. In order to speed up the response time of Social Explorer, the Income Data was exported as 6 different CSV files, seperated by the 6 different cities in the Yelp Data Set. Since this was the case, the Yelp Dataset was again split into six pieces based on the state. The relevant Income Data was appended to each restaurant based on the associated FIPS codes. All of the pieces were then recombined to reform the original dataset.
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+# Load US Income Data
+Charlotte_Income <-read.csv("Charlotte_Income.csv") %>% 
+   mutate(Median_Income = SE_T057_001) %>% select(Geo_FIPS, Median_Income)
+Las_Vegas_Income <-read.csv("Las_Vegas_Income.csv") %>% 
+   mutate(Median_Income = SE_T057_001) %>% select(Geo_FIPS, Median_Income)
+Madison_Income <-read.csv("Madison_Income.csv") %>% 
+   mutate(Median_Income = SE_T057_001) %>% select(Geo_FIPS, Median_Income)
+Pittsburgh_Income <-read.csv("Pittsburgh_Income.csv") %>% 
+   mutate(Median_Income = SE_T057_001) %>% select(Geo_FIPS, Median_Income)
+Phoenix_Income <-read.csv("Phoenix_Income.csv") %>% 
+   mutate(Median_Income = SE_T057_001) %>% select(Geo_FIPS, Median_Income)
+Urbana_Champaign_Income <-read.csv("Urbana_Champaign_Income.csv") %>% 
+   mutate(Median_Income = SE_T057_001) %>% select(Geo_FIPS, Median_Income)
+
+
+
+# Fix FIPS Codes
+Charlotte_Income <- Charlotte_Income %>% 
+  mutate(Geo_FIPS= as.character(Geo_FIPS))
+Las_Vegas_Income <- Las_Vegas_Income %>% 
+  mutate(Geo_FIPS= as.character(Geo_FIPS))
+Madison_Income <- Madison_Income %>% 
+  mutate(Geo_FIPS= as.character(Geo_FIPS))
+Pittsburgh_Income <- Pittsburgh_Income %>% 
+  mutate(Geo_FIPS= as.character(Geo_FIPS))
+Phoenix_Income <- Phoenix_Income %>% 
+  mutate(Geo_FIPS= str_pad(as.character(Geo_FIPS),11, pad="0"))
+Urbana_Champaign_Income <- Urbana_Champaign_Income %>% 
+  mutate(Geo_FIPS= as.character(Geo_FIPS))
+
+# Combine Dataset
+yelp_AZ_restaurants_ref2 <- left_join(yelp_AZ_restaurants_ref2, Phoenix_Income, by=c("FIPS"="Geo_FIPS"))
+
+# Fix FIPS Again
+yelp_IL_restaurants_ref <- yelp_IL_restaurants_ref %>% 
+  mutate(FIPS= str_sub(FIPS, 1, 11))
+yelp_IL_restaurants_ref <- left_join(yelp_IL_restaurants_ref, Urbana_Champaign_Income, by=c("FIPS"="Geo_FIPS"))
+yelp_NC_restaurants_ref <- left_join(yelp_NC_restaurants_ref, Charlotte_Income, by=c("FIPS"="Geo_FIPS"))
+yelp_NV_restaurants_ref <- left_join(yelp_NV_restaurants_ref, Las_Vegas_Income, by=c("FIPS"="Geo_FIPS"))
+yelp_PA_restaurants_ref <- left_join(yelp_PA_restaurants_ref, Pittsburgh_Income, by=c("FIPS"="Geo_FIPS"))
+yelp_WI_restaurants_ref <- left_join(yelp_WI_restaurants_ref, Madison_Income, by=c("FIPS"="Geo_FIPS"))
+
+yelp_US_restaurants_ref2 <- bind_rows(yelp_AZ_restaurants_ref2,yelp_IL_restaurants_ref)
+yelp_US_restaurants_ref2 <- bind_rows(yelp_US_restaurants_ref2,yelp_NC_restaurants_ref)
+yelp_US_restaurants_ref2 <- bind_rows(yelp_US_restaurants_ref2,yelp_NV_restaurants_ref)
+yelp_US_restaurants_ref2 <- bind_rows(yelp_US_restaurants_ref2,yelp_PA_restaurants_ref)
+yelp_US_restaurants_ref2 <- bind_rows(yelp_US_restaurants_ref2,yelp_WI_restaurants_ref)
+```
+
+
 
 ## Exploratory Data Analysis
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
-# Don't forget to take care of the NA case in all of these variables
 
-# Distribution of Star Reviews
-ggplot(data=yelp_US_restaurants, aes(x=stars)) + geom_bar()
-yelp_US_restaurants %>% select(stars) %>% summary()
+I specifically looked at Price Range, Attire, Take-Out, Noise Level, Alcohol, if the restaurant accepts credit cards,Wi-Fi, if the restaurant is open latenight, if it has a romantic atmosphere, if it has an intimate atmosphere, if it has a classy atmosphere, if it has a touristy atmosphere, if it has street parking, if it has validated parking, if it has valet parking, if it has a DJ, and if it has Vegetarian food. I also looked at the Median Income, Median Age, the proportion of white people, the proportion of black people, the proportion of people from age 18-24, and the proportion of people from age 25-34 of the restaurant.
 
-# Stars vs. Price Range
+Although all of these attributes were explored, the ones that I decided to use were Proportion of White People where the restaurant is located, the Median Income where the restaurant is located, the Price Range of the restaurant (out of 4), and if the restaurant accepts credit cards.
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+# Stars vs. Accepts Credit Cards 
+ggplot(data=yelp_US_restaurants_ref2, aes(x=yelp_US_restaurants_ref2$'attributes.Accepts Credit Cards', y=stars, group=yelp_US_restaurants_ref2$'attributes.Accepts Credit Cards')) +geom_boxplot()
+
+# Stars vs. Price Range 
 ggplot(data=yelp_US_restaurants, aes(x=yelp_US_restaurants$'attributes.Price Range', y=stars, group=yelp_US_restaurants$'attributes.Price Range')) +geom_boxplot()
 
-# Stars vs. Attire
-ggplot(data=yelp_US_restaurants, aes(x=yelp_US_restaurants$'attributes.Attire', y=stars, group=yelp_US_restaurants$'attributes.Attire')) +geom_boxplot()
+# Stars vs. Proportion of White People
+ggplot(data=yelp_US_restaurants_ref2, aes(y=yelp_US_restaurants_ref2$Proportion_White, x=stars, group=stars)) +geom_boxplot()
 
-# Stars vs. Take-Out
-ggplot(data=yelp_US_restaurants, aes(x=yelp_US_restaurants$'attributes.Take-out', y=stars, group=yelp_US_restaurants$'attributes.Take-out')) +geom_boxplot()
+# Stars vs. Median Income
+ggplot(data=yelp_US_restaurants_ref2, aes(y=yelp_US_restaurants_ref2$Median_Income, x=stars, group=stars)) +geom_boxplot()
+```
 
-# Stars vs. Noise Level
-ggplot(data=yelp_US_restaurants, aes(x=yelp_US_restaurants$'attributes.Noise Level', y=stars, group=yelp_US_restaurants$'attributes.Noise Level')) +geom_boxplot()
+## Making a Model
+In order to predict the rating of the restaurants, I created a logistic regression model using the four variables that I identified in the Exploratory Data Analysis. I defined a training set (5% of the restaurants.) in order to train the model to predict a good rating . Since I used this model, I defined a "good" rating as a star rating that was higher than three. I then tested the model on a test set (95% of the restaurants). The training set had a 66% success rate, and the test set had a 63% success set. 
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.width=8, fig.height=4.5}
+# Take Care of all of the NA Values
+yelp_US_restaurants_ref2 <- yelp_US_restaurants_ref2 %>% 
+    mutate(is_good_rating=ifelse(stars>3, 1, 0))
+yelp_US_restaurants_ref2 <- yelp_US_restaurants_ref2 %>%
+  filter(!is.na(Proportion_White))
+yelp_US_restaurants_ref2 <- yelp_US_restaurants_ref2 %>% 
+  filter(!is.na(Median_Income))
+yelp_US_restaurants_ref2 <- yelp_US_restaurants_ref2 %>%
+  filter(!is.na(`attributes.Accepts Credit Cards`))
+yelp_US_restaurants_ref2 <- yelp_US_restaurants_ref2 %>%
+  filter(!is.na(`attributes.Price Range`))
+
+# Training the model
+training <- yelp_US_restaurants_ref2 %>% sample_n(685)
+test <- anti_join(yelp_US_restaurants_ref2, training, by="business_id")
+
+predict_good_rating_model <- glm(is_good_rating ~ Proportion_White + Median_Income + `attributes.Accepts Credit Cards`+ `attributes.Price Range`, data=training, family="binomial")
+broom::tidy(predict_good_rating_model)
+
+training <- training %>% 
+  mutate(p_hat = predict(predict_good_rating_model, newdata=training, type="response"))
+
+training_correct <- training %>% filter(p_hat > .5 & is_good_rating==1 | p_hat <.5 & is_good_rating ==0)
+(training_correct %>% tally())/ (training %>% tally()) *100
+
+p_hat <- predict(predict_good_rating_model, newdata=test, type="response")
+test <- test %>% 
+  mutate(p_hat = (predict(predict_good_rating_model, newdata=test, type="response")))
+
+test %>% 
+  select(p_hat, is_good_rating)
+
+test_correct <- test %>% filter(p_hat > .5 & is_good_rating==1 | p_hat <.5 & is_good_rating ==0)
+test_correct %>% tally()/ (test %>% tally()) *100
 
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Conclusion
+Based on the training and test sets from the logistic regression model, the model was not very accurate at predicting a good rating for restaurants. What this means is that the rating could not be accurately predicted based on these attributes. This suggests that other factors such as the quality and taste of the food may be more important for predicting the star rating than attributes and location. In fact, for a lot of these attributes, the distribution based on a star rating was unchanged, meaning that certain attributes did not affect the star rating. 
